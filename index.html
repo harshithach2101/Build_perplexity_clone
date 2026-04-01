@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harshi | AI Search</title>
+    <!-- Google Fonts for Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Marked.js for Markdown Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css?v=2">
+</head>
+<body>
+
+    <!-- Profile & Settings Menus -->
+    <div id="settingsModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="settings-body">
+                <div class="setting-item">
+                    <label>Creativity (Temperature)</label>
+                    <input type="range" min="0" max="1" step="0.1" value="0.5" id="tempSlider">
+                    <span id="tempValue">0.5</span>
+                </div>
+                <div class="setting-item">
+                    <label>Response Length</label>
+                    <input type="range" min="100" max="4000" step="100" value="2000" id="tokenSlider">
+                    <span id="tokenValue">2000</span>
+                </div>
+                <div class="setting-item">
+                    <label>Dark Mode</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" checked id="themeToggle">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="profileDropdown" class="dropdown-menu" style="display: none;">
+        <div class="dropdown-item" id="newChatDropdownBtn">
+            <i data-lucide="plus-circle"></i>
+            New Chat
+        </div>
+        <hr>
+        <div class="dropdown-header">Recent History</div>
+        <div id="historyList">
+            <!-- Dynamic history items here -->
+            <div class="history-empty">No recent chats</div>
+        </div>
+        <hr>
+        <div class="dropdown-item" id="settingsBtn">
+            <i data-lucide="settings"></i>
+            Settings
+        </div>
+        <div class="dropdown-item" id="logoutBtn" style="color: #ff5555;">
+            <i data-lucide="log-out"></i>
+            Logout
+        </div>
+    </div>
+
+    <header>
+        <div class="header-spacer"></div>
+        <div class="mode-toggle">
+            <button class="toggle-btn active" id="focusMode" title="Focus Mode">
+                <i data-lucide="sparkles"></i>
+            </button>
+            <button class="toggle-btn" id="proMode" title="Pro Mode">
+                <i data-lucide="laptop-minimal"></i>
+            </button>
+        </div>
+
+        <img src="https://ui-avatars.com/api/?name=Harshi+AI&background=20b2aa&color=fff" alt="User" class="user-avatar" id="avatarBtn">
+    </header>
+
+    <main id="mainContainer">
+        <div class="landing-content" id="landingContent">
+            <h1 class="logo-text">Harshi</h1>
+        </div>
+        
+        <div class="chat-history" id="chatHistory">
+            <!-- Dynamic chat messages will go here -->
+        </div>
+    </main>
+
+    <div class="bottom-controls">
+        <div class="chips-container">
+            <div class="chip" id="factCheckChip">
+                <i data-lucide="check-square"></i>
+                Fact check
+            </div>
+            <div class="chip" id="researchChip">
+                <i data-lucide="search"></i>
+                Research
+            </div>
+            <div class="chip" id="recommendChip">
+                <i data-lucide="thumbs-up"></i>
+                Recommend
+            </div>
+        </div>
+
+        <div id="mediaPreview" class="media-preview" style="display: none;"></div>
+        <form id="chatForm" autocomplete="off" class="input-container">
+            <input type="file" id="fileInput" style="display: none;" accept="image/*,application/pdf">
+            <div class="input-wrapper">
+                <input type="text" placeholder="Ask anything..." id="aiInput">
+            </div>
+            <div class="input-actions">
+                <div class="left-actions">
+                    <button type="button" class="icon-btn plus-btn" title="Upload files">
+                        <i data-lucide="plus"></i>
+                    </button>
+                    <div class="model-pill" id="modelPill" style="cursor: pointer;">
+                        Models
+                        <i data-lucide="chevron-down" style="width: 14px; height: 14px; margin-left: 4px;"></i>
+                    </div>
+                </div>
+                <div class="right-actions">
+                    <button type="button" class="icon-btn" title="Focus" id="focusBtn">
+                        <i data-lucide="globe"></i>
+                    </button>
+                    <button type="button" class="icon-btn" title="Pro Search" id="proBtn">
+                        <i data-lucide="zap"></i>
+                    </button>
+                    <button type="button" class="icon-btn" title="Voice search" id="micBtn">
+                        <i data-lucide="mic"></i>
+                    </button>
+                    <button type="submit" class="icon-btn send-btn" id="sendBtn" title="Send message">
+                        <i data-lucide="arrow-up"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Model Selector Menu -->
+    <div id="modelDropdown" class="dropdown-menu" style="display: none;">
+        <div class="dropdown-item" data-model="gemini-1.5-flash-latest">
+            <i data-lucide="zap"></i>
+            Gemini 1.5 Flash
+        </div>
+        <div class="dropdown-item" data-model="gemini-1.5-pro-latest">
+            <i data-lucide="brain-circuit"></i>
+            Gemini 1.5 Pro
+        </div>
+        <div class="dropdown-item" data-model="gemini-1.0-pro-latest">
+            <i data-lucide="cpu"></i>
+            Gemini 1.0 Pro
+        </div>
+    </div>
+
+    <script src="/static/script.js?v=2"></script>
+</body>
+</html>
